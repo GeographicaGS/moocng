@@ -21,7 +21,7 @@ from PIL import Image, ImageOps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, RegexValidator
 from django.db import models
 from django.db import transaction
 from django.db.models import signals
@@ -47,6 +47,8 @@ from itertools import groupby
 
 logger = logging.getLogger(__name__)
 
+alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', _('Only alphanumeric characters are allowed.'))
+numeric = RegexValidator(r'^[0-9]*$', _('Only numeric characters are allowed.'))
 
 class Language(models.Model):
     name = models.CharField(verbose_name=_(u'Name'), max_length=200)
@@ -100,14 +102,16 @@ class Course(Sortable):
                                        verbose_name=_(u'Language')
                                        )
 
-    estimated_effort = models.CharField(verbose_name=_(u'Estimated effort'),
+    estimated_effort = models.CharField(verbose_name=_(u'Estimated effort (hours/week)'),
                                  null = True,
                                  blank=True,
-                                 max_length=128)
+                                 max_length=128,
+                                 validators=[numeric])
 
     hashtag = models.CharField(verbose_name=_(u'Hashtag'),
                                 default='Hashtag',
-                                max_length=128)
+                                max_length=128,
+                                validators=[alphanumeric])
 
     promotion_media_content_type = models.CharField(verbose_name=_(u'Content type'),
                                                     max_length=20,
