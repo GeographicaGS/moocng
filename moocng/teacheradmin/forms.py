@@ -32,6 +32,7 @@ from moocng.teacheradmin.tasks import send_massive_email_task
 from moocng.media_contents import media_content_extract_id
 
 from moocng.assets.models import Asset
+import re
 
 
 class CourseForm(TranslationModelForm):
@@ -112,8 +113,6 @@ class CourseForm(TranslationModelForm):
     def clean(self):
         start_date = self.cleaned_data.get("start_date")
         end_date = self.cleaned_data.get("end_date")
-        print start_date
-        print end_date
         if start_date >= end_date:
             raise forms.ValidationError(_('Start date must be lower than end date'))
         return self.cleaned_data
