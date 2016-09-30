@@ -144,6 +144,12 @@
                 {{ form.estimated_effort }}
                 {% if form.estimated_effort.help_text %}<span class="help-inline">{{ form.estimated_effort.help_text }}</span>{% endif %}
             </p>
+            <p>
+                {{ form.course_duration.errors }}
+                {{ form.course_duration.label_tag }}
+                {{ form.course_duration }}
+                {% if form.course_duration.help_text %}<span class="help-inline">{{ form.course_duration.help_text }}</span>{% endif %}
+            </p>
             <p class="hide">
                 {{ form.completion_badge.errors }}
                 {{ form.completion_badge.label_tag }}
