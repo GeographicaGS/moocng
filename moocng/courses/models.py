@@ -82,6 +82,9 @@ class Course(Sortable):
     end_date = models.DateField(verbose_name=_(u'End date'),
                                 blank=True, null=True)
 
+    course_duration = models.PositiveSmallIntegerField( verbose_name=_('Course duration (hours)'),
+                                                        blank= True, null=True)
+
     ects = models.PositiveSmallIntegerField(verbose_name=_(u'ECTS:'),
                                                               default=8)
 

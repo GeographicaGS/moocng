@@ -147,7 +147,14 @@
     <p><span class="user">{{ user.get_full_name }}</span>
     <span class="lightText">{% trans 'has succesfully completed' %} <strong>{% trans 'with a score of' %} {{ course_mark }}</strong></span>
     <span class="course">{{ course.name }}</span>
-    {% trans 'an online course of' %} {{ course.start_date|timesince:course.end_date }} {% trans 'authorized by' %} {{ course.owner.get_profile.organization.all|first }} {% trans 'and featured by' %} {{ site.name }}.</p>
+    {% trans 'an online course of' %}
+    {% if course.course_duration %}
+      {{ course.course_duration }} {% trans 'hours' %} 
+    {% else %}
+      {{ course.start_date|timesince:course.end_date }}
+    {% endif %}
+    {% trans 'authorized by' %} {{ course.owner.get_profile.organization.all|first }}
+    {% trans 'and featured by' %} {{ site.name }}.</p>
     <p>{% trans 'And therefore, this diploma is issued' %}.</p>
     <pdf:nexttemplate name="backside">
     <div><pdf:nextpage /></div>
