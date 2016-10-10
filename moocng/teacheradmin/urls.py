@@ -69,6 +69,13 @@ urlpatterns = patterns('moocng.teacheradmin.views',
 
     url(r'^groups/$', 'teacheradmin_groups', name='teacheradmin_groups'),
 
+    url(r'^guestlist/$', 'teacheradmin_guestlist', name='teacheradmin_guestlist'),
+
+    url(r'^guestlist/invite/$', 'teacheradmin_guestlist_invite',
+        name='teacheradmin_guestlist_invite'),
+
+    url(r'^guestlist/delete/(?P<email_or_id>[^/]+)/$', 'teacheradmin_guestlist_delete',
+        name='teacheradmin_guestlist_delete'),
 
     url(r'^categories/$', 'teacheradmin_categories',
         name='teacheradmin_categories'),

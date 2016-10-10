@@ -33,10 +33,16 @@
                     <fieldset>
                         <legend>{% trans 'Status' %}</legend>
                         <p>
-                        {{ form.status.errors }}
-                        {{ form.status.label_tag }}
-                        {{ form.status }}
-                        {% if form.status.help_text %}<span class="help-inline">{{ form.status.help_text }}</span>{% endif %}
+                          {{ form.status.errors }}
+                          {{ form.status.label_tag }}
+                          {{ form.status }}
+                          {% if form.status.help_text %}<span class="help-inline">{{ form.status.help_text }}</span>{% endif %}
+                        </p>
+                        <p class="{% if num_enrollment_methods == 1 %}hide{% endif %}">
+                            {{ form.enrollment_method.errors }}
+                            {{ form.enrollment_method.label_tag }}
+                            {{ form.enrollment_method }}
+                            {% if form.enrollment_method.help_text %}<span class="help-inline">{{ form.enrollment_method.help_text }}</span>{% endif %}
                         </p>
                     </fieldset>
                 </div>
@@ -78,12 +84,6 @@
                                     {{ form.end_date.label_tag }}
                                     <input type="date" name="end_date" id="id_end_date" value="{{ form.end_date.value|date:'Y-m-d' }}" class="input-xlarge" />
                                     {% if form.end_date.help_text %}<span class="help-inline">{{ form.end_date.help_text }}</span>{% endif %}
-                                </p>
-                                <p class="hide">
-                                    {{ form.enrollment_method.errors }}
-                                    {{ form.enrollment_method.label_tag }}
-                                    {{ form.enrollment_method }}
-                                    {% if form.enrollment_method.help_text %}<span class="help-inline">{{ form.enrollment_method.help_text }}</span>{% endif %}
                                 </p>
                             </div>
                         </div>

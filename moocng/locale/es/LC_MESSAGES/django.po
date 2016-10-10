@@ -4474,7 +4474,6 @@ msgid "Groups already exist for this course"
 msgstr "Los grupos de este curso ya están creados"
 
 #: teacheradmin/templates/teacheradmin/info.html:16
-#, fuzzy
 msgid "General Info"
 msgstr "Información general"
 
@@ -4483,21 +4482,18 @@ msgid "Extra info"
 msgstr "Información extra"
 
 #: teacheradmin/templates/teacheradmin/info.html:22
-#, fuzzy
 msgid "Course appearance"
-msgstr "profesor del curso"
+msgstr "Apariencia del curso"
 
 #: teacheradmin/templates/teacheradmin/info.html:25
 msgid "Credits and diploma"
-msgstr ""
+msgstr "Creditos y diplomas"
 
 #: teacheradmin/templates/teacheradmin/info.html:47
-#, fuzzy
 msgid "General info"
 msgstr "Información general"
 
 #: teacheradmin/templates/teacheradmin/info.html:124
-#, fuzzy
 msgid "Extra field"
 msgstr "Información extra"
 

@@ -64,6 +64,8 @@ from moocng.externalapps.models import externalapps
 
 from moocng.badges.models import BadgeByCourse
 
+from moocng.guestlist_enrollment.models import CourseGuestList
+
 import pprint
 
 from django.core import serializers
@@ -583,7 +585,6 @@ def teacheradmin_teachers(request, course_slug):
         'request': request,
     }, context_instance=RequestContext(request))
 
-
 @is_teacher_or_staff
 def teacheradmin_teachers_delete(request, course_slug, email_or_id):
     course = get_object_or_404(Course, slug=course_slug)
@@ -718,6 +719,78 @@ def teacheradmin_teachers_reorder(request, course_slug):
 
     return response
 
+@is_teacher_or_staff
+def teacheradmin_guestlist(request, course_slug):
+    course = get_object_or_404(Course, slug=course_slug)
+    is_enrolled = course.students.filter(id=request.user.id).exists()
+
+    return render_to_response('teacheradmin/guestlist.html', {
+        'course': course,
+        'is_enrolled': is_enrolled,
+        'students_enrolled': CourseGuestList.objects.filter(course=course, status='e'),
+        'students_invited': CourseGuestList.objects.filter(course=course, status='i'),
+        'request': request,
+    }, context_instance=RequestContext(request))
+
+@is_teacher_or_staff
+def teacheradmin_guestlist_invite(request, course_slug):
+    course = get_object_or_404(Course, slug=course_slug)
+    email_or_id = request.POST['data'].lower()
+    user = None
+    response = None
+
+    try:
+        validate_email(email_or_id)
+        # is email
+        try:
+            user = User.objects.get(email=email_or_id)
+        except User.DoesNotExist:
+            pass
+    except ValidationError:
+        # is id
+        try:
+            user = User.objects.get(id=email_or_id)
+        except (ValueError, User.DoesNotExist):
+            response = HttpResponse(status=404)
+
+    if user is not None:
+        try:
+            cgl = CourseGuestList.objects.get(course=course, student=user)
+            return HttpResponse(status=409)
+        except CourseGuestList.DoesNotExist:
+            cgl = CourseGuestList.objects.create(course=course, student=user)
+        # send_invitation_registered(request, user.email, course)
+        name = user.get_full_name()
+        if not name:
+            name = user.username
+        data = {
+            'id': user.id,
+            'name': name,
+            'gravatar': gravatar_img_for_email(user.email, 20),
+            'pending': False
+        }
+        response = HttpResponse(simplejson.dumps(data),
+                                mimetype='application/json')
+
+    # By now, if the user does not exists, we return a Not Found error
+    else:
+        response = HttpResponse(status=404)
+
+    return response
+
+@is_teacher_or_staff
+def teacheradmin_guestlist_delete(request, course_slug, email_or_id):
+    course = get_object_or_404(Course, slug=course_slug)
+    response = HttpResponse()
+
+    try:
+        cgl = CourseGuestList.objects.get(course=course, student=email_or_id)
+        cgl.delete()
+        #send_removed_notification(request, cgl.teacher.email, course)
+    except (ValueError, CourseGuestList.DoesNotExist):
+        response = HttpResponse(status=404)
+
+    return response
 
 @is_teacher_or_staff
 def teacheradmin_info(request, course_slug):
@@ -747,6 +820,8 @@ def teacheradmin_info(request, course_slug):
         form = CourseForm(instance=course)
         static_page_form = StaticPageForm(instance=course.static_page)
 
+    num_enrollment_methods = len(settings.ENROLLMENT_METHODS)
+
     return render_to_response('teacheradmin/info.html', {
         'course': course,
         'is_enrolled': is_enrolled,
@@ -757,6 +832,7 @@ def teacheradmin_info(request, course_slug):
         'thumb_rec_width': course.THUMBNAIL_WIDTH,
         'back_rec_height': course.BACKGROUND_HEIGHT,
         'back_rec_width': course.BACKGROUND_WIDTH,
+        'num_enrollment_methods': num_enrollment_methods
     }, context_instance=RequestContext(request))
 
 

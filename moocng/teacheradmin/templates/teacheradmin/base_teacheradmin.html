@@ -11,6 +11,9 @@
             <li class="nav-header">{% trans "Course edition" %}</li>
             <li class="{% block nav-teacheradmin-info %}{% endblock %}"><a href="{% url teacheradmin_info course.slug %}">{% trans "Information" %}</a></li>
             <li class="{% block nav-teacheradmin-teachers %}{% endblock %}"><a href="{% url teacheradmin_teachers course.slug %}">{% trans "Teachers" %}</a></li>
+            {% if course.enrollment_method == 'guestlist' %}
+              <li class="{% block nav-teacheradmin-guestlist %}{% endblock %}"><a href="{% url teacheradmin_guestlist course.slug %}">{% trans "Students list" %}</a></li>
+            {% endif %}
             <li class="{% block nav-teacheradmin-units %}{% endblock %}"><a href="{% url teacheradmin_units course.slug %}">{% trans "Units" %}</a></li>
             {% if feature_groups %}
             <li class="{% block nav-teacheradmin-groups %}{% endblock %}"><a href="{% url teacheradmin_groups course.slug %}">{% trans "Groups" %}</a></li>
