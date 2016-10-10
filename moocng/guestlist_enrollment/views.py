@@ -35,8 +35,6 @@ def guestlist_enrollment(request, course_slug):
                 else:
                     language = request.LANGUAGE_CODE
 
-                print 'Language = %s' % (language)
-
                 groupCollection = mongodb.get_db().get_collection('groups')
                 groups = groupCollection.find({ 'id_course': course.id, 'lang': language }).sort("size",pymongo.ASCENDING)
                 if groups:
