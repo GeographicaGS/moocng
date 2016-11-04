@@ -48,7 +48,7 @@
     <tbody>
         {% for element in students_enrolled %}
         <tr>
-          <td class="hide">{{ element.student.id }}</td>
+          <td class="hide">{{ element.id }}</td>
           <td>{% gravatar_img_for_email element.student.email 20 %}</td>
           <td>{% firstof element.student.get_full_name element.student.username %}</td>
           <td>{{ element.student.email }}</td>
@@ -67,10 +67,10 @@
     <tbody>
         {% for element in students_invited %}
         <tr>
-          <td class="hide">{{ element.student.id }}</td>
-          <td>{% gravatar_img_for_email element.student.email 20 %}</td>
-          <td>{% firstof element.student.get_full_name element.student.username %}</td>
-          <td>{{ element.student.email }}</td>
+          <td class="hide">{{ element.id }}</td>
+          <td>{% gravatar_img_for_email element.email 20 %}</td>
+          <td>{% firstof element.student.get_full_name element.student.username '--' %}</td>
+          <td>{% firstof element.student.email element.email %}</td>
           <td class="align-right">
             <span class="icon-remove pointer"></span>
           </td>

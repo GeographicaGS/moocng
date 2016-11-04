@@ -57,6 +57,41 @@ def send_removed_notification(request, email, course):
     to = [email]
     send_mail_wrapper(subject, template, context, to)
 
+def send_student_invitation_not_registered(request, invitation):
+    subject = _(u'You have been invited to be a student in "%s"') % invitation.course.name
+    template = 'teacheradmin/email_invitation_student_not_registered.txt'
+    context = {
+        'host': request.user.get_full_name() or request.user.username,
+        'course': invitation.course.name,
+        'course_url': "https://%s%s" % (request.get_host(), reverse('course_overview', args=[invitation.course.slug])),
+        'site': get_current_site(request).name
+    }
+    to = [invitation.email]
+    send_mail_wrapper(subject, template, context, to)
+
+def send_student_invitation_registered(request, email, course):
+    subject = _(u'You have been invited to be a student in "%s"') % course.name
+    template = 'teacheradmin/email_invitation_student.txt'
+    context = {
+        'course': course.name,
+        'host': request.user.get_full_name() or request.user.username,
+        'course_url': "https://%s%s" % (request.get_host(), reverse('course_overview', args=[course.slug])),
+        'site': get_current_site(request).name
+    }
+    to = [email]
+    send_mail_wrapper(subject, template, context, to)
+
+def send_student_removed_notification(request, email, course):
+    subject = _(u'You have been removed as student from "%s"') % course.name
+    template = 'teacheradmin/email_remove_student.txt'
+    context = {
+        'course': course.name,
+        'host': request.user.get_full_name() or request.user.username,
+        'site': get_current_site(request).name
+    }
+    to = [email]
+    send_mail_wrapper(subject, template, context, to)
+
 def get_num_students_passed_course(course):
     return get_db().get_collection('marks_course').find({"course_id": course.id, "mark": {"$gte": float(course.threshold)}}).count()
 

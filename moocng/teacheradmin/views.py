@@ -50,6 +50,9 @@ from moocng.teacheradmin.tasks import send_massive_email_task
 from moocng.teacheradmin.utils import (send_invitation_registered,
                                        send_removed_notification,
                                        send_invitation_not_registered,
+                                       send_student_invitation_registered,
+                                       send_student_removed_notification,
+                                       send_student_invitation_not_registered,
                                        get_num_students_passed_course,
                                        get_num_students_completed_course,
                                        get_num_students_started_course,
@@ -65,6 +68,7 @@ from moocng.externalapps.models import externalapps
 from moocng.badges.models import BadgeByCourse
 
 from moocng.guestlist_enrollment.models import CourseGuestList
+from moocng.guestlist_enrollment.methods import unenroll_student
 
 import pprint
 
@@ -755,11 +759,11 @@ def teacheradmin_guestlist_invite(request, course_slug):
 
     if user is not None:
         try:
-            cgl = CourseGuestList.objects.get(course=course, student=user)
+            cgl = CourseGuestList.objects.get(course=course, student=user,email=user.email)
             return HttpResponse(status=409)
         except CourseGuestList.DoesNotExist:
-            cgl = CourseGuestList.objects.create(course=course, student=user)
-        # send_invitation_registered(request, user.email, course)
+            cgl = CourseGuestList.objects.create(course=course, student=user,email=user.email)
+        send_student_invitation_registered(request, user.email, course)
         name = user.get_full_name()
         if not name:
             name = user.username
@@ -771,22 +775,37 @@ def teacheradmin_guestlist_invite(request, course_slug):
         }
         response = HttpResponse(simplejson.dumps(data),
                                 mimetype='application/json')
-
-    # By now, if the user does not exists, we return a Not Found error
-    else:
-        response = HttpResponse(status=404)
+    elif response is None:
+        if CourseGuestList.objects.filter(email=email_or_id, course=course).count() == 0:
+            invitation = CourseGuestList.objects.create(
+                email=email_or_id,
+                course=course
+            )
+            invitation.save()
+            send_student_invitation_not_registered(request, invitation)
+            data = {
+                'name': email_or_id,
+                'gravatar': gravatar_img_for_email(email_or_id, 20),
+                'pending': True
+            }
+            response = HttpResponse(simplejson.dumps(data),
+                                    mimetype='application/json')
+        else:
+            response = HttpResponse(status=409)
 
     return response
 
 @is_teacher_or_staff
-def teacheradmin_guestlist_delete(request, course_slug, email_or_id):
+def teacheradmin_guestlist_delete(request, course_slug, invitation_id):
     course = get_object_or_404(Course, slug=course_slug)
     response = HttpResponse()
 
     try:
-        cgl = CourseGuestList.objects.get(course=course, student=email_or_id)
+        cgl = CourseGuestList.objects.get(pk=invitation_id)
+        if cgl.status == 'e' and cgl.student is not None:
+            unenroll_student(course, cgl.student)
+        send_student_removed_notification(request, cgl.email, course)
         cgl.delete()
-        #send_removed_notification(request, cgl.teacher.email, course)
     except (ValueError, CourseGuestList.DoesNotExist):
         response = HttpResponse(status=404)
 

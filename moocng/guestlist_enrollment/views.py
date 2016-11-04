@@ -84,8 +84,10 @@ def guestlist_enrollment(request, course_slug):
                 enroll_course_at_idp(request.user, course)
 
             # Update student status
-            cgl = CourseGuestList.objects.get(course=course,student=user)
+            cgl = CourseGuestList.objects.get(course=course,email=user.email)
             cgl.status = 'e'
+            if(cgl.student is None):
+                cgl.student = user
             cgl.save()
 
             # Send xAPI event

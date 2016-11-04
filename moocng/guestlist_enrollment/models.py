@@ -14,8 +14,13 @@ class CourseGuestList(models.Model):
     student = models.ForeignKey(
         User,
         verbose_name=_(u'Student'),
-        blank=False,
-        null=False
+        blank=True,
+        null=True
+    )
+    email = models.EmailField(
+        verbose_name=_(u'Email'),
+        blank=True,
+        null=True
     )
     STUDENT_STATUSES = (
         ('i', _(u'Invited')),
