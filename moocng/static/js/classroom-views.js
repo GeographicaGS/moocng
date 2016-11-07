@@ -22,6 +22,8 @@ if (_.isUndefined(MOOC.views)) {
     MOOC.views = {};
 }
 
+MOOC.alertTime = 4000;
+
 MOOC.views.KQ_TITLE_MAX_LENGTH = 60;
 
 MOOC.views.Unit = Backbone.View.extend({
