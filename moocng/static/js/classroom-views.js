@@ -230,10 +230,13 @@ MOOC.views.KnowledgeQuantum = Backbone.View.extend({
             });
 
             // Call activity if media type has no end event
-            var media_type = this.model.get('media_content_type');
-            if(media_type != 'youtube' && media_type != 'ytaccesible' && media_type != 'vimeo'){
-                //MOOC.players_listener.trigger('mediaContentFinished', MOOC.views.kqViews[this.model.get('id')]);
-            }
+            // var media_type = this.model.get('media_content_type');
+            // if(media_type != 'youtube' && media_type != 'ytaccesible' && media_type != 'vimeo'){
+            //   var _this = this;
+            //   setTimeout(function () {
+            //     MOOC.players_listener.trigger('mediaContentFinished', MOOC.views.kqViews[_this.model.get('id')]);
+            //   }, 1000);
+            // }
         }, this);
 
         if (MOOC.views.lastPlayerView) {
