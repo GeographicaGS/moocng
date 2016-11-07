@@ -1,0 +1,8 @@
+{% load i18n %}
+
+{% blocktrans %}Hello, you have been invited to be a student in the course "{{ course }}" by {{ host }}.
+
+Click on this link to go to the course: {{ course_url }}.
+
+Best regards, {{ site }}'s team
+{% endblocktrans %}
