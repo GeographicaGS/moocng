@@ -75,11 +75,11 @@
 		              </form></li>
 		            {% endif %}
 		          {% endfor %}
-		      {% endif %}
-		     {% if show_logout %}
-			<li class="divider"></li>
-			<li><a href="{% url logout %}">{% trans "Log out" %}</a></li>
-			{% endif %}
+		        {% endif %}
+		        {% if show_logout %}
+              <li class="divider"></li>
+              <li><a href="{% if forced_logout %}{% url forced_logout %}{% else %}{% url logout %}{% endif %}">{% trans "Log out" %}</a></li>
+            {% endif %}
 		</ul>
 	</div>
 </div>
