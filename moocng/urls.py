@@ -53,6 +53,8 @@ urlpatterns = patterns('',
 
     url(r'^auth/', include('moocng.auth_handlers.urls')),
 
+    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': settings.LOGOUT_REDIRECT_URL}, name='forced_logout'),
+
     url(r'^', include('moocng.profile.urls')),
 )
 

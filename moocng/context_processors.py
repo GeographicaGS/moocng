@@ -237,6 +237,11 @@ def extra_settings(request):
     except AttributeError:
         show_logout = False
 
+    try:
+        forced_logout = settings.FORCED_LOGOUT
+    except AttributeError:
+        forced_logout = False
+
     context = {
         'site_url': site_url,
         'sandbox': sandbox,
@@ -267,6 +272,7 @@ def extra_settings(request):
         'show_username': show_username,
         'show_email': show_email,
         'show_logout': show_logout,
+        'forced_logout': forced_logout,
     }
 
     return context
