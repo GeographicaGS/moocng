@@ -425,8 +425,9 @@ MOOCNG_THEME = {
     #'prefoot_template': u'prefoot.html',
     #'link_home': 'https://ecolearning.eu',
     #'link_catalogue': 'https://ecolearning.eu',
-    #'link_tos': u'http://ecolearning.eu/terms-of-use/',
-    #'link_privacy': u'http://ecolearning.eu/privacy-policy/',
+    #'link_tos': u'http://project.ecolearning.eu/terms/',
+    #'link_privacy': u'http://project.ecolearning.eu/privacy/',
+    #'link_copyright': u'http://project.ecolearning.eu/terms/',
     #'header_right_logo': STATIC_URL + u'brand/img/logo_defensa_cab.png',
     #'diploma_template': u'diploma.html'
 }
