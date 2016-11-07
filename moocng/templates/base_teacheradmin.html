@@ -1,5 +1,5 @@
 {% load i18n %}<!DOCTYPE html>
-<html class="no-js" lang="{{ LANGUAGE_CODE }}">
+<html class="{% if LANGUAGE_BIDI %}rtl{% endif %} no-js" lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -33,6 +33,7 @@
   <link href='//fonts.googleapis.com/css?family=Open+Sans:300,400italic,400,700,800' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/grid.css" />
   <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/moocng_teacheradmin.css" />
+  {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/rtl.css" />{% endif %}
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/libs/jquery-1.7.2.min.js"><&#47;script>');</script>
