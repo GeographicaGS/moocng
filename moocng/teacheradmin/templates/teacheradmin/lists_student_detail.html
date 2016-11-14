@@ -41,13 +41,23 @@
 		<tbody>
 			{% for element in elements %}
 			<tr>
-				<td>{{ element.title }}</td>
-				<td>{{ element.mark }}</td>
-				<td>{{ element.relative_mark }}</td>
+				<td><strong>{{ element.title }}</strong></td>
+        <td><strong>{{ element.progress }}% {% trans 'completed' %}</strong></td>
+				<td><strong>{{ element.mark }}</strong></td>
+				<td><strong>{{ element.relative_mark }}</strong></td>
 			</tr>
 				{% for kq in element.kqs %}
 				<tr class="indented">
 					<td>{{ kq.title }}</td>
+          {% if kq.completed %}
+            {% if kq.correct %}
+            <td>{% trans 'Correct' %}</td>
+            {% else %}
+            <td>{% trans 'Incorrect' %}</td>
+            {% endif %}
+          {% else %}
+          <td>{% trans 'Pending' %}</td>
+          {% endif %}
 					<td>{{ kq.mark }}</td>
 					<td>{{ kq.relative_mark }}</td>
 				</tr>

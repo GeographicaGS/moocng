@@ -1318,22 +1318,42 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
     student = get_object_or_404(User, username=username)
     mark, mark_info = calculate_course_mark(course, student)
     units = get_units_info_from_course(course, student)
-    headers = [_(u"Title"), _(u"Mark"), _(u"Relative mark")]
+    headers = [_(u"Title"), _(u"Status"), _(u"Mark"), _(u"Relative mark")]
     elements = []
     for unitmark in units:
         try:
             unit = Unit.objects.get(pk=unitmark["unit_id"])
-            element = {"title": unit.title, "mark": "%.2f" % unitmark["mark"], "relative_mark": "%.2f" % unitmark["relative_mark"], "order": unit.order}
+            element = {
+                "title": unit.title,
+                "mark": "%.2f" % unitmark["mark"],
+                "relative_mark": "%.2f" % unitmark["relative_mark"],
+                "order": unit.order
+            }
             element["kqs"] = []
             kqs = get_kqs_info_from_unit(unit, student)
+
+            kqscompleted = 0;
             for kqmark in kqs:
                 try:
                     kq = KnowledgeQuantum.objects.get(pk=kqmark["kq_id"])
-                    element_kq = {"title": kq.title, "mark": "%.2f" % kqmark["mark"], "relative_mark": "%.2f" % kqmark["relative_mark"], "order": kq.order}
+                    kq_is_completed = kq.is_completed(student)
+                    element_kq = {
+                        "title": kq.title,
+                        "mark": "%.2f" % kqmark["mark"],
+                        "relative_mark": "%.2f" % kqmark["relative_mark"],
+                        "order": kq.order,
+                        "completed": kq_is_completed,
+                        "correct": kq.is_correct(student)
+                    }
                     element["kqs"].append(element_kq)
+
+                    if kq_is_completed:
+                        kqscompleted += 1
                 except:
                     pass
+
             element["kqs"].sort(key=lambda x: x["order"], reverse=False)
+            element["progress"] = int(100.0 / len(element["kqs"]) * kqscompleted)
 
             elements.append(element)
         except:
