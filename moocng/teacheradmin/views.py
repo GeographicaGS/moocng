@@ -1336,6 +1336,9 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
     units = get_units_info_from_course(course, student)
     headers = [_(u"Title"), _(u"Status"), _(u"Mark"), _(u"Relative mark")]
     elements = []
+    db = get_db()
+    submissions_col = db.get_collection("peer_review_submissions")
+    reviews_col = db.get_collection("peer_review_reviews")
     for unitmark in units:
         try:
             unit = Unit.objects.get(pk=unitmark["unit_id"])
@@ -1361,6 +1364,30 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
                         "completed": kq_is_completed,
                         "correct": kq.is_correct(student)
                     }
+
+                    # Check Peer review
+                    if kq.peerreviewassignment is not None:
+                        element_kq["peerreview"] = {}
+
+                        pr_submission = submissions_col.find({
+                            "course": course.id,
+                            "unit": unit.id,
+                            "kq": kq.id,
+                            "author": student.id
+                        })
+                        if len(pr_submission) == 1:
+                            element_kq["peerreview"]["submission"] = {
+                                "created": pr_submission[0].created
+                            }
+                            if "text" in pr_submission[0]:
+                                element_kq["peerreview"]["submission"]["text"] = pr_submission[0].text
+                            if "file" in pr_submission[0]:
+                                element_kq["peerreview"]["submission"]["file"] = pr_submission[0].file
+                            if pr_submission.reviews > 0:
+                                pr_reviews = reviews_col.find({
+                                    "submission_id": pr_submission.id
+                                })
+
                     element["kqs"].append(element_kq)
 
                     if kq_is_completed:
