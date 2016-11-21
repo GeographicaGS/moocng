@@ -1226,21 +1226,37 @@ def teacheradmin_lists_coursestudents(request, course_slug, format=None, filter=
         students = _get_students_by_filter(filter, course)
 
     if format is None:
-        headers = [_(u"First name"), _(u"Last name"), _(u"Email"), _(u"Date joined"), _(u"Last login"), _(u"View details")]
+        headers = [_(u"First name"), _(u"Last name"), _(u"Email"), _(u"Language"), _(u"Date joined"), _(u"Last login"), _(u"View details")]
         elements = []
 
         if len(students):
             if not hasattr(students[:1][0], 'student'):
                 for student in students:
                     try:
-                        element = [student.first_name, student.last_name, student.email, student.date_joined.strftime('%d/%m/%Y'), student.last_login.strftime('%d/%m/%Y'), {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.username])}]
+                        element = [
+                            student.first_name,
+                            student.last_name,
+                            student.email,
+                            student.get_profile().get_language_display(),
+                            student.date_joined.strftime('%d/%m/%Y'),
+                            student.last_login.strftime('%d/%m/%Y'),
+                            {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.username])}
+                        ]
                         elements.append(element)
                     except:
                         continue
             else:
                 for student in students:
                     try:
-                        element = [student.student.first_name, student.student.last_name, student.student.email, student.student.date_joined.strftime('%d/%m/%Y'), student.student.last_login.strftime('%d/%m/%Y'), {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.student.username])}]
+                        element = [
+                            student.student.first_name,
+                            student.student.last_name,
+                            student.student.email,
+                            student.get_profile().get_language_display(),
+                            student.student.date_joined.strftime('%d/%m/%Y'),
+                            student.student.last_login.strftime('%d/%m/%Y'),
+                            {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.student.username])}
+                        ]
                         elements.append(element)
                     except:
                         continue
