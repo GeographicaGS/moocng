@@ -1366,27 +1366,33 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
                     }
 
                     # Check Peer review
-                    if kq.peerreviewassignment is not None:
-                        element_kq["peerreview"] = {}
+                    try:
+                        if kq.peerreviewassignment is not None:
+                            element_kq["peerreview"] = {}
 
-                        pr_submission = submissions_col.find({
-                            "course": course.id,
-                            "unit": unit.id,
-                            "kq": kq.id,
-                            "author": student.id
-                        })
-                        if len(pr_submission) == 1:
-                            element_kq["peerreview"]["submission"] = {
-                                "created": pr_submission[0].created
-                            }
-                            if "text" in pr_submission[0]:
-                                element_kq["peerreview"]["submission"]["text"] = pr_submission[0].text
-                            if "file" in pr_submission[0]:
-                                element_kq["peerreview"]["submission"]["file"] = pr_submission[0].file
-                            if pr_submission.reviews > 0:
-                                pr_reviews = reviews_col.find({
-                                    "submission_id": pr_submission.id
-                                })
+                            pr_submission = submissions_col.find({
+                                "course": course.id,
+                                "unit": unit.id,
+                                "kq": kq.id,
+                                "author": student.id
+                            })
+
+                            if pr_submission.count() == 1:
+                                element_kq["peerreview"]["submission"] = {
+                                    "created": pr_submission[0]['created']
+                                }
+                                if "text" in pr_submission[0]:
+                                    element_kq["peerreview"]["submission"]["text"] = pr_submission[0]['text']
+                                if "file" in pr_submission[0]:
+                                    element_kq["peerreview"]["submission"]["file"] = pr_submission[0]['file']
+                                if pr_submission[0]['reviews'] > 0:
+                                    pr_reviews = reviews_col.find({
+                                        "submission_id": pr_submission[0]['id']
+                                    })
+
+                            print element_kq["peerreview"]
+                    except:
+                        pass
 
                     element["kqs"].append(element_kq)
 
