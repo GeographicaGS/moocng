@@ -547,20 +547,59 @@ def change_user_group(id_user, id_group, new_id_group, pos_lat=0.0, pos_lon=0.0)
     activity_entry = {"id_course": group["id_course"], "id_user": id_user, "former_id_group": ObjectId(id_group), "new_id_group": ObjectId(new_id_group), "timestamp": timestamp, "lat": pos_lat, "lon": pos_lon}
     groupsActivityCollection.insert(activity_entry)
 
-def get_course_students_csv(course):
+# def get_course_students_csv(course):
+#     course_file = StringIO.StringIO()
+#
+#     course_csv = csv.writer(course_file, quoting=csv.QUOTE_ALL)
+#     headers = ["first_name", "last_name", "email", "language"]
+#     course_csv.writerow(headers)
+#
+#     h = HTMLParser()
+#     for student in course.students.all():
+#         row = []
+#         for field in headers:
+#             fieldvalue = getattr(student, field)
+#             row.append(h.unescape(fieldvalue).encode("utf-8", "replace"))
+#         course_csv.writerow(row)
+#
+#     return course_file.getvalue()
+
+def get_course_students_csv(course, studentlist):
     course_file = StringIO.StringIO()
 
     course_csv = csv.writer(course_file, quoting=csv.QUOTE_ALL)
-    headers = ["first_name", "last_name", "email"]
+    headers = ["first_name", "last_name", "email", "language"]
     course_csv.writerow(headers)
 
     h = HTMLParser()
-    for student in course.students.all():
-        row = []
-        for field in headers:
-            fieldvalue = getattr(student, field)
-            row.append(h.unescape(fieldvalue).encode("utf-8", "replace"))
-        course_csv.writerow(row)
+    if not hasattr(studentlist[:1][0], 'student'):
+        for student in studentlist:
+            row = []
+            try:
+                language = student.get_profile().get_language_display() or _(u"Not defined")
+                row = [
+                    h.unescape(student.first_name).encode("utf-8", "replace"),
+                    h.unescape(student.last_name).encode("utf-8", "replace"),
+                    h.unescape(student.email).encode("utf-8", "replace"),
+                    h.unescape(language).encode("utf-8", "replace"),
+                    ]
+            except:
+                continue
+            course_csv.writerow(row)
+    else:
+        for student in studentlist:
+            row = []
+            try:
+                language = student.get_profile().get_language_display() or _(u"Not defined")
+                row = [
+                    h.unescape(student.student.first_name).encode("utf-8", "replace"),
+                    h.unescape(student.student.last_name).encode("utf-8", "replace"),
+                    h.unescape(student.student.email).encode("utf-8", "replace"),
+                    h.unescape(language).encode("utf-8", "replace"),
+                ]
+            except:
+                continue
+            course_csv.writerow(row)
 
     return course_file.getvalue()
 
