@@ -1269,7 +1269,7 @@ def teacheradmin_lists_coursestudents(request, course_slug, format=None, filter=
         }, context_instance=RequestContext(request))
 
     elif format == 'csv':
-        students_list = get_course_students_csv(course)
+        students_list = get_course_students_csv(course, students)
 
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (course_slug)
