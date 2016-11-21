@@ -12,7 +12,21 @@
 {% endblock %}
 
 {% block extrajs %}
+<script type="text/javascript">
+$(document).ready(function () {
+    "use strict";
 
+    $("a.assignmentDetailLink").click(function (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        var $link = $(evt.target),
+            id = parseInt($link.data("assignment"), 10);
+
+        $("#modal" + id + ".modal").modal();
+    });
+});
+</script>
 {% endblock %}
 
 {% block section %}
@@ -29,6 +43,7 @@
 				{% for header in headers %}
 				<th>{{ header }}</th>
 				{% endfor %}
+        <th></th>
 			</tr>
 		</thead>
 		<tfoot>
@@ -36,6 +51,7 @@
 				{% for header in headers %}
 				<th>{{ header }}</th>
 				{% endfor %}
+        <th></th>
 			</tr>
 		</tfoot>
 		<tbody>
@@ -45,6 +61,7 @@
         <td><strong>{{ element.progress }}% {% trans 'completed' %}</strong></td>
 				<td><strong>{{ element.mark }}</strong></td>
 				<td><strong>{{ element.relative_mark }}</strong></td>
+        <td></td>
 			</tr>
 				{% for kq in element.kqs %}
 				<tr class="indented">
@@ -60,6 +77,49 @@
           {% endif %}
 					<td>{{ kq.mark }}</td>
 					<td>{{ kq.relative_mark }}</td>
+          <td>
+            {% if kq.peerreview %}
+              <a class="assignmentDetailLink" href="#" data-assignment="{{ kq.id }}">{% trans 'View assignment' %}</a>
+
+              <div class="modal hide fade" id="modal{{ kq.id }}">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h3>{% trans "Assignment for" %} {{ kq.title }}</h3>
+                  </div>
+                  <div class="modal-body">
+                    {% if kq.peerreview.submission %}
+                      <strong>{% trans "Submitted" %}:</strong>
+                      <div class="">{{ kq.peerreview.submission.created }}</div>
+                      <strong>{% trans "Content" %}</strong>
+                      <div class="well well-small">{{ kq.peerreview.submission.text }}</div>
+                      {% if kq.peerreview.submission.file %}
+                        <a href="{{ kq.peerreview.submission.file }}" target="_blank">{% trans "Submitted file" %}</a>
+                      {% endif %}
+                    {% endif %}
+                    {% if kq.peerreview.reviews %}
+                      <strong>{% trans "Reviews" %}:</strong>
+                      {% for review in kq.peerreview.reviews %}
+                        <strong>{% trans "Reviewed on"%}</strong>
+                        <div class="well well-small">{{ review.created }}</div>
+                        <strong>{% trans "Reviewer"%}</strong>
+                        <div class="well well-small">{{ review.reviewer }}</div>
+                        <strong>{% trans "Criteria"%}</strong>
+                        <div class="well well-small">
+                          {% for criteria in review.criteria %}
+                            {{ criteria }}<br>
+                          {% endfor %}
+                        </div>
+                        <strong>{% trans "Comment"%}</strong>
+                        <div class="well well-small">{{ review.comment }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans "Close" %}</button>
+                  </div>
+              </div>
+            {% endif %}
+          </td>
 				</tr>
 				{% endfor %}
 			{% endfor %}

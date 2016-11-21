@@ -1357,6 +1357,7 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
                     kq = KnowledgeQuantum.objects.get(pk=kqmark["kq_id"])
                     kq_is_completed = kq.is_completed(student)
                     element_kq = {
+                        "id": kq.id,
                         "title": kq.title,
                         "mark": "%.2f" % kqmark["mark"],
                         "relative_mark": "%.2f" % kqmark["relative_mark"],
@@ -1385,12 +1386,22 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
                                     element_kq["peerreview"]["submission"]["text"] = pr_submission[0]['text']
                                 if "file" in pr_submission[0]:
                                     element_kq["peerreview"]["submission"]["file"] = pr_submission[0]['file']
+
                                 if pr_submission[0]['reviews'] > 0:
                                     pr_reviews = reviews_col.find({
-                                        "submission_id": pr_submission[0]['id']
+                                        "submission_id": pr_submission[0]['_id']
                                     })
 
-                            print element_kq["peerreview"]
+                                    if(pr_reviews.count() > 0):
+                                        element_kq["peerreview"]["reviews"] = []
+                                        for review in pr_reviews:
+                                            element_review = {
+                                                "created": review["created"],
+                                                "reviewer": review["reviewer"],
+                                                "criteria": review["criteria"],
+                                                "comment": review["comment"]
+                                            }
+                                            element_kq["peerreview"]["reviews"].append(element_review)
                     except:
                         pass
 
