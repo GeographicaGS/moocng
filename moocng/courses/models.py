@@ -661,6 +661,29 @@ class KnowledgeQuantum(Sortable):
 
         return True
 
+    def is_correct(self, user):
+        questions = self.question_set.filter()
+        if questions.count() == 0:
+            # no question: a kq is correct if it is completed
+            try:
+                return self.is_completed(user)
+            except AttributeError:
+                return False
+        else:
+            question = questions[0]  # there should be only one question
+
+            db = get_db()
+            answers = db.get_collection("answers")
+            answer = answers.find_one({
+                "user_id": user.id,
+                "question_id": question.id,
+            })
+
+            if not answer:
+                return False
+
+            return question.is_correct(answer)
+
     def kq_type(self):
         from moocng.peerreview.models import PeerReviewAssignment
         if self.question_set.count() > 0:

@@ -1226,21 +1226,37 @@ def teacheradmin_lists_coursestudents(request, course_slug, format=None, filter=
         students = _get_students_by_filter(filter, course)
 
     if format is None:
-        headers = [_(u"First name"), _(u"Last name"), _(u"Email"), _(u"Date joined"), _(u"Last login"), _(u"View details")]
+        headers = [_(u"First name"), _(u"Last name"), _(u"Email"), _(u"Language"), _(u"Date joined"), _(u"Last login"), _(u"View details")]
         elements = []
 
         if len(students):
             if not hasattr(students[:1][0], 'student'):
                 for student in students:
                     try:
-                        element = [student.first_name, student.last_name, student.email, student.date_joined.strftime('%d/%m/%Y'), student.last_login.strftime('%d/%m/%Y'), {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.username])}]
+                        element = [
+                            student.first_name,
+                            student.last_name,
+                            student.email,
+                            student.get_profile().get_language_display(),
+                            student.date_joined.strftime('%d/%m/%Y'),
+                            student.last_login.strftime('%d/%m/%Y'),
+                            {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.username])}
+                        ]
                         elements.append(element)
                     except:
                         continue
             else:
                 for student in students:
                     try:
-                        element = [student.student.first_name, student.student.last_name, student.student.email, student.student.date_joined.strftime('%d/%m/%Y'), student.student.last_login.strftime('%d/%m/%Y'), {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.student.username])}]
+                        element = [
+                            student.student.first_name,
+                            student.student.last_name,
+                            student.student.email,
+                            student.get_profile().get_language_display(),
+                            student.student.date_joined.strftime('%d/%m/%Y'),
+                            student.student.last_login.strftime('%d/%m/%Y'),
+                            {"caption": _(u"Go"), "link": reverse('teacheradmin_lists_coursestudents_detail', args=[course.slug, student.student.username])}
+                        ]
                         elements.append(element)
                     except:
                         continue
@@ -1318,22 +1334,75 @@ def teacheradmin_lists_coursestudents_detail(request, course_slug, username, for
     student = get_object_or_404(User, username=username)
     mark, mark_info = calculate_course_mark(course, student)
     units = get_units_info_from_course(course, student)
-    headers = [_(u"Title"), _(u"Mark"), _(u"Relative mark")]
+    headers = [_(u"Title"), _(u"Status"), _(u"Mark"), _(u"Relative mark")]
     elements = []
+    db = get_db()
+    submissions_col = db.get_collection("peer_review_submissions")
+    reviews_col = db.get_collection("peer_review_reviews")
     for unitmark in units:
         try:
             unit = Unit.objects.get(pk=unitmark["unit_id"])
-            element = {"title": unit.title, "mark": "%.2f" % unitmark["mark"], "relative_mark": "%.2f" % unitmark["relative_mark"], "order": unit.order}
+            element = {
+                "title": unit.title,
+                "mark": "%.2f" % unitmark["mark"],
+                "relative_mark": "%.2f" % unitmark["relative_mark"],
+                "order": unit.order
+            }
             element["kqs"] = []
             kqs = get_kqs_info_from_unit(unit, student)
+
+            kqscompleted = 0;
             for kqmark in kqs:
                 try:
                     kq = KnowledgeQuantum.objects.get(pk=kqmark["kq_id"])
-                    element_kq = {"title": kq.title, "mark": "%.2f" % kqmark["mark"], "relative_mark": "%.2f" % kqmark["relative_mark"], "order": kq.order}
+                    kq_is_completed = kq.is_completed(student)
+                    element_kq = {
+                        "title": kq.title,
+                        "mark": "%.2f" % kqmark["mark"],
+                        "relative_mark": "%.2f" % kqmark["relative_mark"],
+                        "order": kq.order,
+                        "completed": kq_is_completed,
+                        "correct": kq.is_correct(student)
+                    }
+
+                    # Check Peer review
+                    try:
+                        if kq.peerreviewassignment is not None:
+                            element_kq["peerreview"] = {}
+
+                            pr_submission = submissions_col.find({
+                                "course": course.id,
+                                "unit": unit.id,
+                                "kq": kq.id,
+                                "author": student.id
+                            })
+
+                            if pr_submission.count() == 1:
+                                element_kq["peerreview"]["submission"] = {
+                                    "created": pr_submission[0]['created']
+                                }
+                                if "text" in pr_submission[0]:
+                                    element_kq["peerreview"]["submission"]["text"] = pr_submission[0]['text']
+                                if "file" in pr_submission[0]:
+                                    element_kq["peerreview"]["submission"]["file"] = pr_submission[0]['file']
+                                if pr_submission[0]['reviews'] > 0:
+                                    pr_reviews = reviews_col.find({
+                                        "submission_id": pr_submission[0]['id']
+                                    })
+
+                            print element_kq["peerreview"]
+                    except:
+                        pass
+
                     element["kqs"].append(element_kq)
+
+                    if kq_is_completed:
+                        kqscompleted += 1
                 except:
                     pass
+
             element["kqs"].sort(key=lambda x: x["order"], reverse=False)
+            element["progress"] = int(100.0 / len(element["kqs"]) * kqscompleted)
 
             elements.append(element)
         except:
