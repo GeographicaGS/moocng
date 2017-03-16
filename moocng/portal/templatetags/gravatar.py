@@ -29,7 +29,11 @@ register = template.Library()
 
 @register.simple_tag
 def gravatar_for_email(email):
-    url = "%savatar/%s?d=mm" % (GRAVATAR_URL_PREFIX, md5_constructor(email).hexdigest())
+    url = None
+    try:
+        url = "%savatar/%s?d=mm" % (GRAVATAR_URL_PREFIX, md5_constructor(email).hexdigest())
+    except Exception:
+        url = "https://www.gravatar.com/avatar/0"
     if GRAVATAR_DEFAULT_IMAGE is not None:
         url += "?%s" % urllib.urlencode({"default": GRAVATAR_DEFAULT_IMAGE})
     return mark_safe(url)
@@ -37,6 +41,12 @@ def gravatar_for_email(email):
 
 @register.simple_tag
 def gravatar_img_for_email(email, size=80):
-    url = gravatar_for_email(email)
+    url = None
+    try:
+        url = gravatar_for_email(email)
+    except Exception:
+        url = "https://www.gravatar.com/avatar/0"
+    if GRAVATAR_DEFAULT_IMAGE is not None:
+        url += "?%s" % urllib.urlencode({"default": GRAVATAR_DEFAULT_IMAGE})
     img = '<img src="%s" height="%s" width="%s"/>' % (url, size, size)
     return mark_safe(img)

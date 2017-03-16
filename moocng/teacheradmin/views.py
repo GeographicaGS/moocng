@@ -650,11 +650,18 @@ def teacheradmin_teachers_invite(request, course_slug):
         name = user.get_full_name()
         if not name:
             name = user.username
+
+        gravatar = None
+        try:
+            gravatar = gravatar_img_for_email(user.email, 20)
+        except Exception:
+            gravatar = ""
+
         data = {
             'id': ct.id,
             'order': ct.order,
             'name': name,
-            'gravatar': gravatar_img_for_email(user.email, 20),
+            'gravatar': gravatar,
             'pending': False
         }
         response = HttpResponse(simplejson.dumps(data),
@@ -665,9 +672,16 @@ def teacheradmin_teachers_invite(request, course_slug):
                                     course=course, datetime=datetime.now())
             invitation.save()
             send_invitation_not_registered(request, invitation)
+
+            gravatar = None
+            try:
+                gravatar = gravatar_img_for_email(email_or_id, 20)
+            except Exception:
+                gravatar = ""
+
             data = {
                 'name': email_or_id,
-                'gravatar': gravatar_img_for_email(email_or_id, 20),
+                'gravatar': gravatar,
                 'pending': True
             }
             response = HttpResponse(simplejson.dumps(data),
@@ -767,10 +781,17 @@ def teacheradmin_guestlist_invite(request, course_slug):
         name = user.get_full_name()
         if not name:
             name = user.username
+
+        gravatar = None
+        try:
+            gravatar = gravatar_img_for_email(user.email, 20)
+        except Exception:
+            gravatar = ""
+
         data = {
             'id': user.id,
             'name': name,
-            'gravatar': gravatar_img_for_email(user.email, 20),
+            'gravatar': gravatar,
             'pending': False
         }
         response = HttpResponse(simplejson.dumps(data),
@@ -783,9 +804,16 @@ def teacheradmin_guestlist_invite(request, course_slug):
             )
             invitation.save()
             send_student_invitation_not_registered(request, invitation)
+
+            gravatar = None
+            try:
+                gravatar = gravatar_img_for_email(email_or_id, 20)
+            except Exception:
+                gravatar = ""
+
             data = {
                 'name': email_or_id,
-                'gravatar': gravatar_img_for_email(email_or_id, 20),
+                'gravatar': gravatar,
                 'pending': True
             }
             response = HttpResponse(simplejson.dumps(data),
