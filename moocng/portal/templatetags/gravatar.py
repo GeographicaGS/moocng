@@ -35,18 +35,12 @@ def gravatar_for_email(email):
     except Exception:
         url = "https://www.gravatar.com/avatar/0"
     if GRAVATAR_DEFAULT_IMAGE is not None:
-        url += "?%s" % urllib.urlencode({"default": GRAVATAR_DEFAULT_IMAGE})
+        url += "?%s" % urllib.urlencode({"d": GRAVATAR_DEFAULT_IMAGE})
     return mark_safe(url)
 
 
 @register.simple_tag
 def gravatar_img_for_email(email, size=80):
-    url = None
-    try:
-        url = gravatar_for_email(email)
-    except Exception:
-        url = "https://www.gravatar.com/avatar/0"
-    if GRAVATAR_DEFAULT_IMAGE is not None:
-        url += "?%s" % urllib.urlencode({"default": GRAVATAR_DEFAULT_IMAGE})
+    url = gravatar_for_email(email)
     img = '<img src="%s" height="%s" width="%s"/>' % (url, size, size)
     return mark_safe(img)
