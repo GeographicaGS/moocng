@@ -20,7 +20,7 @@ from django.utils.hashcompat import md5_constructor
 from django.utils.safestring import mark_safe
 
 
-GRAVATAR_URL_PREFIX = getattr(settings, "GRAVATAR_URL_PREFIX", "http://www.gravatar.com/")
+GRAVATAR_URL_PREFIX = getattr(settings, "GRAVATAR_URL_PREFIX", "https://www.gravatar.com/")
 GRAVATAR_DEFAULT_IMAGE = getattr(settings, "GRAVATAR_DEFAULT_IMAGE", None)
 
 
@@ -29,9 +29,13 @@ register = template.Library()
 
 @register.simple_tag
 def gravatar_for_email(email):
-    url = "%savatar/%s?d=mm" % (GRAVATAR_URL_PREFIX, md5_constructor(email).hexdigest())
+    url = None
+    try:
+        url = "%savatar/%s" % (GRAVATAR_URL_PREFIX, md5_constructor(email).hexdigest())
+    except Exception:
+        url = "https://www.gravatar.com/avatar/0"
     if GRAVATAR_DEFAULT_IMAGE is not None:
-        url += "?%s" % urllib.urlencode({"default": GRAVATAR_DEFAULT_IMAGE})
+        url += "?%s" % urllib.urlencode({"d": GRAVATAR_DEFAULT_IMAGE})
     return mark_safe(url)
 
 
