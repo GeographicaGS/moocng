@@ -21,7 +21,7 @@ from django.utils.safestring import mark_safe
 
 
 GRAVATAR_URL_PREFIX = getattr(settings, "GRAVATAR_URL_PREFIX", "https://www.gravatar.com/")
-GRAVATAR_DEFAULT_IMAGE = getattr(settings, "GRAVATAR_DEFAULT_IMAGE", None)
+GRAVATAR_DEFAULT_IMAGE = getattr(settings, "GRAVATAR_DEFAULT_IMAGE", "mm")
 
 
 register = template.Library()
